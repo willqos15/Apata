@@ -19,6 +19,7 @@ const pets: Pet[] = [
     vermifugado: true,
     castrado: false,
     adotado: false,
+    //
   },
 ]
 
