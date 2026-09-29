@@ -24,6 +24,7 @@ export interface PetFormValues {
   porte: Size | ''
   sexo: Sex | ''
   contato: string
+  adotado: boolean
   vacinado: boolean
   vermifugado: boolean
   castrado: boolean

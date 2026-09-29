@@ -9,6 +9,15 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
+const BOOLEAN_FIELDS = ['adotado', 'vacinado', 'vermifugado', 'castrado'] as const
+
+function convertBooleansToString(fields: Record<string, unknown>): void {
+  for (const field of BOOLEAN_FIELDS) {
+    const value = fields[field]
+    if (typeof value === 'string') fields[field] = value === 'true'
+  }
+}
+
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
@@ -31,6 +40,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     const { fields, file } = await readPetBody(request)
     const dataUpdate: Record<string, unknown> = { ...fields }
+    convertBooleansToString(dataUpdate)
 
     let fotoSubstituida: string | null = null
 

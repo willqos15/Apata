@@ -35,7 +35,7 @@ function capitalize(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 }
 
 export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }: ItemProps) {
-  const { id, nome, descricao, especie, foto, porte, sexo, contato } = pet
+  const { id, nome, descricao, especie, foto, porte, sexo, contato, adotado, vacinado, vermifugado, castrado } = pet
 
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -54,7 +54,8 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
     reset,
   } = useForm<PetFormValues>({
     mode: 'onChange',
-    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', contato: '' },
+    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', contato: '',adotado: false,  vacinado: false, vermifugado: false, castrado: false,
+    },
   })
 
   async function save(values: PetFormValues) {
@@ -64,7 +65,8 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
 
       const formData = new FormData()
       ;(Object.keys(values) as Array<keyof PetFormValues>).forEach((key) => {
-        formData.append(key, values[key].toString())
+        const value = values[key]
+        formData.append(key, typeof value === 'boolean' ? String(value) : value)
       })
 
       if (croppedPhotoFile.current)
@@ -91,7 +93,17 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
 
   function toggleEdit() {
     setEditing(!editing)
-    reset({ nome, descricao, especie, porte, sexo, contato: contato ? digitsOnly(contato) : '' })
+    reset({ nome,
+      descricao,
+      especie,
+      porte,
+      sexo,
+      contato: contato ? digitsOnly(contato) : '',
+      adotado: !!adotado,
+      vacinado: !!vacinado,
+      vermifugado: !!vermifugado,
+      castrado: !!castrado,
+    })
   }
 
   const whatsappLink = contato
@@ -283,6 +295,25 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
               </label>
               <textarea className="textarea" {...register('descricao', { required: true, onChange: capitalize })} />
               {errors.descricao && <p>Campo obrigatório</p>}
+
+              <div className="flex flex-col gap-2 my-4 text-(--text-color)">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('adotado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Adotado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('vacinado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Vacinado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('vermifugado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Vermifugado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('castrado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Castrado</span>
+                </label>
+              </div>
 
               <label>
                 <strong>Contato: </strong>
