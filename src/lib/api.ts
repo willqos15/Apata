@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { LoginPayload, LoginResponse, Pet, UpdateResult } from '@/types'
+import type { Donation, DonationPayload, LoginPayload, LoginResponse, Pet, UpdateResult } from '@/types'
 import { getToken } from '@/lib/auth'
 
 const API_URL = '/api'
@@ -25,6 +25,11 @@ export async function updatePet(id: Pet['id'], formData: FormData): Promise<Upda
 
 export async function deletePet(id: Pet['id']): Promise<void> {
   await axios.delete(`${API_URL}/pets/${id}`, authConfig())
+}
+
+export async function createDonation(payload: DonationPayload): Promise<Donation> {
+  const { data } = await axios.post<Donation>(`${API_URL}/doacoes`, payload)
+  return data
 }
 
 export async function loginAdmin(credentials: LoginPayload): Promise<LoginResponse> {
