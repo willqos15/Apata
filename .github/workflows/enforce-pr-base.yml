@@ -1,0 +1,32 @@
+name: "Enforce PR base: develop"
+
+on:
+    pull_request:
+        types: [opened, edited, reopened, synchronize]
+
+jobs:
+    check-base:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Enforce merge flow (all -> develop -> main)
+              run: |
+                  BASE="${{ github.base_ref }}"
+                  HEAD="${{ github.head_ref }}"
+                  echo "Base: $BASE / Head: $HEAD"
+
+                  # PR to main/master: only develop can merge
+                  if [ "$BASE" = "main" ]; then
+                    if [ "$HEAD" != "develop" ]; then
+                      echo "::error::Only 'develop' can merge into '$BASE'. Current source: '$HEAD'. Reopen this PR with base 'develop'."
+                      exit 1
+                    fi
+                    echo "OK: develop -> $BASE"
+                    exit 0
+                  fi
+
+                  # All other PRs must target develop
+                  if [ "$BASE" != "develop" ]; then
+                    echo "::error::All branches must merge into 'develop'. This PR targets '$BASE'. Change the base to 'develop'."
+                    exit 1
+                  fi
+                  echo "OK: $HEAD -> develop"
