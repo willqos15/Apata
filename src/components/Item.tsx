@@ -5,6 +5,8 @@ import { Controller, useForm } from 'react-hook-form'
 import { PatternFormat } from 'react-number-format'
 import { MdAddPhotoAlternate } from 'react-icons/md'
 import { IoLogoWhatsapp, IoMdFemale, IoMdMale } from 'react-icons/io'
+import { FaHeart, FaSyringe } from 'react-icons/fa'
+import { GiMedicines } from 'react-icons/gi'
 import Button from './Button'
 import Popup from './Popup'
 import type { Pet, PetFormValues } from '@/types'
@@ -34,7 +36,7 @@ function capitalize(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 }
 
 export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }: ItemProps) {
-  const { id, nome, descricao, especie, foto, porte, sexo, contato } = pet
+  const { id, nome, descricao, especie, foto, porte, sexo, contato, adotado, vermifugado, castrado} = pet
 
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -196,7 +198,27 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
               {especie === 'gato' && sexo === 'macho' && 'Gato de '}
               porte {porte === 'medio' ? 'médio' : porte}
             </label>
-            <p className="text-center text-[18px]">{descricao}.</p>
+            <p className="text-center text-[18px] line-clamp-3">{descricao}.</p>
+  
+            {(adotado || vermifugado || castrado) && (
+                <div className="flex flex-wrap gap-1 justify-center mt-1">
+                    {adotado && (
+                        <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-green-600 border-green-700 text-white">
+                            <FaHeart /> Adotado
+                        </span>
+                    )}
+                    {vermifugado && (
+                        <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-lime-100 border-lime-600 text-lime-700">
+                            <GiMedicines /> Vermifugado
+                        </span>
+                    )}
+                    {castrado && (
+                        <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-emerald-100 border-emerald-600 text-emerald-700">
+                            <FaSyringe /> Castrado
+                        </span>
+                    )}
+                </div>
+            )} 
 
             {whatsappLink ? (
               <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
