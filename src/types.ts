@@ -11,6 +11,7 @@ export interface Pet {
   porte: Size
   descricao: string
   contato: string | null
+  adotado: boolean
   vacinado: boolean | null
   vermifugado: boolean | null
   castrado: boolean | null
@@ -23,6 +24,7 @@ export interface PetFormValues {
   porte: Size | ''
   sexo: Sex | ''
   contato: string
+  adotado: boolean
   vacinado: boolean
   vermifugado: boolean
   castrado: boolean
@@ -63,4 +65,20 @@ export interface DonationFormValues {
   telefone: string
   item: DonationItem | ''
   observacoes: string
+}
+
+export type DonationStatus = 'pendente' | 'contatado' | 'concluido'
+
+export interface Donation {
+  id: string
+  nomeCompleto: string
+  whatsapp: string
+  tipos: DonationItem[]
+  observacoes: string | null
+  status: DonationStatus
+  createdAt: string
+}
+
+export type DonationPayload = Pick<Donation, 'nomeCompleto' | 'whatsapp' | 'tipos'> & {
+  observacoes?: string
 }

@@ -93,6 +93,9 @@ export default function Navbar() {
 
             {isAdmin && (
               <>
+                <li className="navitem">
+                  <Link href="/doacoes" onClick={() => setMenuOpen(false)}>Doações</Link>
+                </li>
                 <li onClick={goToPetRegistration} className="navitem">
                   Cadastrar
                 </li>

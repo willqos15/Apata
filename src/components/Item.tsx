@@ -8,6 +8,7 @@ import { IoLogoWhatsapp, IoMdFemale, IoMdMale } from 'react-icons/io'
 import { FaHeart, FaSyringe } from 'react-icons/fa'
 import { GiMedicines } from 'react-icons/gi'
 import Button from './Button'
+import ImageCropper from './ImageCropper'
 import Popup from './Popup'
 import type { Pet, PetFormValues } from '@/types'
 
@@ -36,12 +37,15 @@ function capitalize(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 }
 
 export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }: ItemProps) {
-  const { id, nome, descricao, especie, foto, porte, sexo, contato, adotado, vermifugado, castrado} = pet
+  const { id, nome, descricao, especie, foto, porte, sexo, contato, adotado, vacinado, vermifugado, castrado } = pet
 
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
   const [zoom, setZoom] = useState(false)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [cropSource, setCropSource] = useState<File | null>(null)
+  const [cropOpen, setCropOpen] = useState(false)
+  const croppedPhotoFile = useRef<File | null>(null)
   const photoInput = useRef<HTMLInputElement>(null)
 
   const {
@@ -52,7 +56,8 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
     reset,
   } = useForm<PetFormValues>({
     mode: 'onChange',
-    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', contato: '' },
+    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', contato: '',adotado: false,  vacinado: false, vermifugado: false, castrado: false,
+    },
   })
 
   async function save(values: PetFormValues) {
@@ -62,13 +67,17 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
 
       const formData = new FormData()
       ;(Object.keys(values) as Array<keyof PetFormValues>).forEach((key) => {
-        formData.append(key, values[key])
+        const value = values[key]
+        formData.append(key, typeof value === 'boolean' ? String(value) : value)
       })
 
-      const file = photoInput.current?.files?.[0]
-      if (file) formData.append('file', file)
+      if (croppedPhotoFile.current)
+        formData.append('file', croppedPhotoFile.current)
 
       await onUpdate(id, formData)
+      croppedPhotoFile.current = null
+      setPhotoPreview(null)
+      if (photoInput.current) photoInput.current.value = ''
     } catch (error) {
       console.error(error)
     } finally {
@@ -80,16 +89,23 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
     const file = e.target.files?.[0]
     if (!file) return
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') setPhotoPreview(reader.result)
-    }
-    reader.readAsDataURL(file)
+    setCropSource(file)
+    setCropOpen(true)
   }
 
   function toggleEdit() {
     setEditing(!editing)
-    reset({ nome, descricao, especie, porte, sexo, contato: contato ? digitsOnly(contato) : '' })
+    reset({ nome,
+      descricao,
+      especie,
+      porte,
+      sexo,
+      contato: contato ? digitsOnly(contato) : '',
+      adotado: !!adotado,
+      vacinado: !!vacinado,
+      vermifugado: !!vermifugado,
+      castrado: !!castrado,
+    })
   }
 
   const whatsappLink = contato
@@ -98,12 +114,29 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
 
   return (
     <>
+      {cropSource && (
+        <ImageCropper
+        image={cropSource}
+        open={cropOpen}
+        onCancel={() => {
+          setCropOpen(false)
+          setCropSource(null)
+        }}
+        onConfirm={(file) => {
+          croppedPhotoFile.current = file
+          setPhotoPreview(URL.createObjectURL(file))
+          setCropOpen(false)
+          setCropSource(null)
+        }}
+        />
+      )}
+
       <Popup
         open={zoom}
         setOpen={setZoom}
         title={`foto ${nome}`}
         content={
-          // eslint-disable-next-line @next/next/no-img-element -- remote user-uploaded photo, host not configured
+
           <img src={foto ?? undefined} alt={nome} className="w-full h-[calc(100vh-100px)] object-contain" />
         }
       />
@@ -132,7 +165,6 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
                 </button>
               )}
 
-              {/* eslint-disable-next-line @next/next/no-img-element -- remote photo or FileReader data URL preview */}
               <img
                 src={photoPreview ?? foto ?? undefined}
                 alt={`um ${especie} ${sexo} ${porte}`}
@@ -285,6 +317,25 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
               </label>
               <textarea className="textarea" {...register('descricao', { required: true, onChange: capitalize })} />
               {errors.descricao && <p>Campo obrigatório</p>}
+
+              <div className="flex flex-col gap-2 my-4 text-(--text-color)">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('adotado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Adotado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('vacinado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Vacinado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('vermifugado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Vermifugado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('castrado')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Castrado</span>
+                </label>
+              </div>
 
               <label>
                 <strong>Contato: </strong>
