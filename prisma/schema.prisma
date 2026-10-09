@@ -16,14 +16,21 @@ model User {
   pets Pet[]
 }
 
+enum FaixaEtaria {
+  Filhote
+  Adulto
+  Idoso
+}
+
 model Pet {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  id            String       @id @default(auto()) @map("_id") @db.ObjectId
   foto          String?
   public_idfoto String?
   nome          String
   especie       String
   porte         String
   sexo          String
+  faixa_etaria  FaixaEtaria? @default(Adulto)
   descricao     String
   contato       String?
 

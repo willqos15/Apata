@@ -27,6 +27,11 @@ export async function deletePet(id: Pet['id']): Promise<void> {
   await axios.delete(`${API_URL}/pets/${id}`, authConfig())
 }
 
+export async function listDonations(): Promise<Donation[]> {
+  const { data } = await axios.get<Donation[]>(`${API_URL}/doacoes`, authConfig())
+  return data
+}
+
 export async function createDonation(payload: DonationPayload): Promise<Donation> {
   const { data } = await axios.post<Donation>(`${API_URL}/doacoes`, payload)
   return data

@@ -58,7 +58,7 @@ export default function Navbar() {
       <header className="flex fixed top-0 justify-between items-center w-full max-h-16 bg-white z-100 px-4 sm:pr-8">
         <div onClick={goToHomePage} className="flex flex-row justify-center items-center gap-x-1 cursor-pointer">
           <Image src={LogoApata} alt="APATA" className="h-5 w-auto" />
-          <h1 className="text-(--text-color) font-extrabold text-base">APATA</h1>
+          <span className="text-(--text-color) font-extrabold text-base">APATA</span>
         </div>
 
         <nav className="relative flex items-center justify-between">
@@ -93,6 +93,9 @@ export default function Navbar() {
 
             {isAdmin && (
               <>
+                <li className="navitem">
+                  <Link href="/doacoes" onClick={() => setMenuOpen(false)}>Doações</Link>
+                </li>
                 <li onClick={goToPetRegistration} className="navitem">
                   Cadastrar
                 </li>

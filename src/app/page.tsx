@@ -1,9 +1,11 @@
+import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { IoLogoWhatsapp } from 'react-icons/io'
 import { CiPill } from 'react-icons/ci'
 import { FaTshirt } from 'react-icons/fa'
 import pixImage from '@/img/QRPIX.jpeg'
+import logoApata from '@/img/logoapata.png'
 import About from '@/components/About'
 import Button from '@/components/Button'
 import CardAside from '@/components/CardAside'
@@ -11,6 +13,7 @@ import Hero from '@/components/Hero'
 import HomePets from '@/components/HomePets'
 import HomePetsFallback from '@/components/HomePetsFallback'
 import { fetchPetsServer } from '@/lib/pets-server'
+import { BASE_OPEN_GRAPH, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from '@/lib/site'
 
 async function PetsFromServer() {
   const pets = await fetchPetsServer()
@@ -31,9 +34,44 @@ function JoinGroupButton() {
   )
 }
 
+export const metadata: Metadata = {
+  alternates: { canonical: '/' },
+  openGraph: {
+    ...BASE_OPEN_GRAPH,
+    url: '/',
+    title: `Adoção de Cães e Gatos em Altamira (PA) | ${SITE_NAME}`,
+    description: SITE_DESCRIPTION,
+  },
+}
+
+const organizationJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NGO',
+  name: 'APATA - Associação de Proteção dos Animais e do Meio Ambiente de Altamira',
+  alternateName: 'APATA',
+  url: SITE_URL,
+  logo: `${SITE_URL}${logoApata.src}`,
+  description: SITE_DESCRIPTION,
+  email: 'apatadealtamira@gmail.com',
+  taxID: '19.552.047/0001-43',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Altamira',
+    addressRegion: 'PA',
+    addressCountry: 'BR',
+  },
+  areaServed: 'Altamira, Pará',
+  sameAs: ['https://www.instagram.com/apataltamira/'],
+}
+
 export default function HomePage() {
   return (
     <div>
+      <script
+        type="application/ld+json"
+        // Escape "<" so pet/org text can never close the script tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd).replace(/</g, '\\u003c') }}
+      />
       <div className="flex flex-wrap flex-row gap-1 items-start justify-center w-full overflow-x-hidden">
         <Suspense fallback={<HomePetsFallback />}>
           <PetsFromServer />
