@@ -34,8 +34,10 @@ export async function POST(request: NextRequest) {
       vacinado,
       vermifugado,
       castrado,
-      castracaoGarantida,
-    } = fields;
+      adotado,
+      castracaoGarantida
+    } = fields
+
 
     let fotoUrl: string | null = null;
     let publicId: string | null = null;
@@ -61,7 +63,7 @@ export async function POST(request: NextRequest) {
         castracaoGarantida: castracaoGarantida === 'true' || castracaoGarantida === true,
         tutelado: tutelado === 'true' || tutelado === true,
         aprovado: true,
-        adotado: false,
+        adotado: adotado === 'true' || adotado === true,
         foto: fotoUrl,
         public_idfoto: publicId,
         ownerId: auth.userId,

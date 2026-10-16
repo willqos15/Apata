@@ -28,8 +28,8 @@ export function getTokenRemainingTime(token: string): number | null {
     if (!payload.exp) return null
 
     return payload.exp * 1000 - Date.now()
-  } catch(err) {
- 
+  } catch (err) {
+    console.error('Erro ao verificar token:', err)
     return null
   }
 }
