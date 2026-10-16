@@ -1,14 +1,14 @@
-import { describe,vi,beforeEach,it ,expect, beforeAll} from "vitest";
-import { getTokenRemainingTime, signToken } from "./jwt";
+import { describe, it, expect } from "vitest";
+import { getTokenRemainingTime } from "./jwt";
 import { sign } from "jsonwebtoken";
 
 
 const mockedSecret = process.env.JWT_SECRET
-if(!mockedSecret) throw new Error("Invalid jwt token")
+if (!mockedSecret) throw new Error("Invalid jwt token")
 
 
 describe('getTokenRemainingTime', () => {
-   
+
   it('should return null when token is empty', () => {
     const time = getTokenRemainingTime('')
 
@@ -23,8 +23,7 @@ describe('getTokenRemainingTime', () => {
     )
 
     const time = getTokenRemainingTime(token)
-    
-   
+
     expect(time).toBeGreaterThan(0)
   })
 
