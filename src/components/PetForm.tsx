@@ -11,23 +11,27 @@ import { createPet } from '@/lib/api'
 import { scrollIntoCenter } from '@/lib/focus'
 import { petFormSchema } from '@/schemas/pet-form-schema'
 
-const DEFAULT_PHONE = '93991185009'
-
 type SubmitStatus = 'inicio' | 'load'
 type SubmitMessage = '' | 'ok' | 'erro'
 type PetFormValues = z.input<typeof petFormSchema>
 
-const EMPTY_VALUES: PetFormValues = {
-  nome: '',
-  especie: '',
-  porte: '',
-  sexo: '',
-  descricao: '',
-  contato: DEFAULT_PHONE,
-  vacinado: false,
-  vermifugado: false,
-  castrado: false,
-}
+const EMPTY_VALUES: PetFormValues = Object.fromEntries(
+  Object.entries(petFormSchema.shape).map(([key, field]) => {
+    if (field instanceof z.ZodDefault) {
+      return [
+        key,
+        field.def.defaultValue,
+      ]
+    }
+    return [key, undefined]
+  })
+)
+const flagFields = [
+  { name: 'vacinado', label: 'Vacinado' },
+  { name: 'vermifugado', label: 'Vermifugado' },
+  { name: 'castrado', label: 'Castrado' },
+  { name: 'adotado', label: 'Adotado' },
+] as const
 
 // Subcomponente para eliminar a repetição dos três <select> com estrutura idêntica.
 function SelectField({
@@ -203,18 +207,12 @@ export default function PetForm() {
           {errors.descricao && <p className="formerro">{errors.descricao.message}</p>}
 
           <div className="flex flex-col gap-2 my-4 text-(--text-color)">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" {...register('vacinado')} className="w-5 h-5 accent-(--bg-color)" />
-              <span className="text-[16px] font-bold">Vacinado</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" {...register('vermifugado')} className="w-5 h-5 accent-(--bg-color)" />
-              <span className="text-[16px] font-bold">Vermifugado</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" {...register('castrado')} className="w-5 h-5 accent-(--bg-color)" />
-              <span className="text-[16px] font-bold">Castrado</span>
-            </label>
+            {flagFields.map(({ name, label }) => (
+              <label key={name} className="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" {...register(name)} className="w-5 h-5 accent-(--bg-color)" />
+                <span className="text-[16px] font-bold">{label}</span>
+              </label>
+            ))}
           </div>
 
           <label className="formlabel"> Contato:</label>
