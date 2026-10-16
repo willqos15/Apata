@@ -5,6 +5,7 @@ export const EMPTY_FILTERS: PetFilters = {
   species: '',
   sex: '',
   size: '',
+  adopted: '',
 }
 
 export function filterPets(pets: Pet[], filters: PetFilters): Pet[] {
@@ -14,6 +15,7 @@ export function filterPets(pets: Pet[], filters: PetFilters): Pet[] {
       (search === '' || pet.nome.toLowerCase().includes(search)) &&
       (filters.species === '' || pet.especie === filters.species) &&
       (filters.sex === '' || pet.sexo === filters.sex) &&
-      (filters.size === '' || pet.porte === filters.size),
+      (filters.size === '' || pet.porte === filters.size) &&
+      (filters.adopted === '' || pet.adotado === filters.adopted),
   )
 }

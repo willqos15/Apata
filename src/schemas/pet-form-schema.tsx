@@ -26,8 +26,8 @@ export const petFormSchema = zod.object({
     .refine((value) => value.replace(/\D/g, '').length === 11, {
       message: 'O número precisa ter 11 dígitos',
     }),
-  vacinado: zod.boolean().optional().default(false),
-  vermifugado: zod.boolean().optional().default(false),
-  castrado: zod.boolean().optional().default(false),
-  adotado: zod.boolean().optional().default(false),
+  vacinado: zod.boolean('Campo obrigatório').optional().default(false),
+  vermifugado: zod.boolean('Campo obrigatório').optional().default(false),
+  castrado: zod.boolean('Campo obrigatório').optional().default(false),
+  adotado: zod.boolean('Campo obrigatório').optional().default(false),
 })

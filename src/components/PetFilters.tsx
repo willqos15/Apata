@@ -6,9 +6,10 @@ import type { PetFilters as PetFiltersValue, Sex, Size, Species } from '@/types'
 interface PetFiltersProps {
   filters: PetFiltersValue
   onChange: (filters: PetFiltersValue) => void
+  isAdmin:boolean
 }
 
-export default function PetFilters({ filters, onChange }: PetFiltersProps) {
+export default function PetFilters({ filters, onChange,isAdmin=false }: PetFiltersProps) {
   return (
     <>
       <Search search={filters.search} setSearch={(search) => onChange({ ...filters, search })} />
@@ -56,7 +57,31 @@ export default function PetFilters({ filters, onChange }: PetFiltersProps) {
             <option value="grande">Grande</option>
           </select>
         </div>
+
       </div>
+
+      {isAdmin && (
+        <div className="flex w-full justify-center mt-2 sm:text-[18pt] text-[12pt]">
+          <div className="flex flex-col text-(--text-color)">
+            <label htmlFor="filtro-adotado">Adotado</label>
+            <select
+              id="filtro-adotado"
+              className="bg-white px-1 rounded-sm text-black border-2 border-(--primary-color)"
+              value={filters.adopted === '' ? '' : String(filters.adopted)}
+              onChange={(e) =>
+                onChange({
+                  ...filters,
+                  adopted: e.target.value === '' ? '' : e.target.value === 'true',
+                })
+              }
+            >
+              <option value="">Todos</option>
+              <option value="true">Sim</option>
+              <option value="false">Não</option>
+            </select>
+          </div>
+        </div>
+      )}
     </>
   )
 }

@@ -1,120 +1,124 @@
-import { render,act } from "@testing-library/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Pet } from '@/types'
+import GerenciarPage from './page'
 
-import AdminPage from "./page";
-
-
-const { mockRedirect } = vi.hoisted(() => ({
-  mockRedirect: vi.fn(),
+const { deletePetMock, listPetsMock, redirectMock, updatePetMock } = vi.hoisted(() => ({
+  deletePetMock: vi.fn(),
+  listPetsMock: vi.fn(),
+  redirectMock: vi.fn(),
+  updatePetMock: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({
-  redirect: mockRedirect,
+  redirect: redirectMock,
 }))
 
-const { spyApi, listPetsMock } = vi.hoisted(() => ({
-  spyApi: vi.fn(),
-  listPetsMock: vi.fn(),
+vi.mock('@/hooks/useSession', () => ({
+  useSession: () => true,
 }))
 
 vi.mock('@/lib/api', () => ({
-  verifyToken: spyApi,
+  deletePet: deletePetMock,
   listPets: listPetsMock,
+  updatePet: updatePetMock,
 }))
 
+vi.mock('@/components/Item', () => ({
+  default: ({ pet, admin }: { pet: Pet; admin: boolean }) => (
+    <div data-testid="pet-item" data-admin={String(admin)}>
+      {pet.nome}
+    </div>
+  ),
+}))
 
-const renderPage = () => {
+const pets: Pet[] = [
+  {
+    id: 'pet-1',
+    nome: 'Rex',
+    foto: null,
+    especie: 'cachorro',
+    sexo: 'macho',
+    porte: 'medio',
+    descricao: 'Cachorro dócil',
+    contato: null,
+    vacinado: true,
+    vermifugado: true,
+    castrado: false,
+    adotado: false,
+  },
+]
+
+function renderPage() {
   const queryClient = new QueryClient({
     defaultOptions: {
-      queries: {
-        retry: false,
-      },
-      mutations: {
-        retry: false,
-      },
+      queries: { retry: false },
+      mutations: { retry: false },
     },
-  });
+  })
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <AdminPage />
+      <GerenciarPage />
     </QueryClientProvider>,
-  );
+  )
+}
 
-};
-
-describe('Admin page session', () => {
-  beforeEach(()=>{
-      vi.clearAllMocks()
-      vi.clearAllTimers()
-      vi.resetAllMocks()
-  })
-  it('should load pets when session is valid', async () => {
-      spyApi.mockResolvedValue(undefined)
-
-      vi.useFakeTimers()
-
-      renderPage()
-
-      await act(async () => {
-          await Promise.resolve()
-      })
-
-      expect(mockRedirect).not.toHaveBeenCalled()
-      expect(listPetsMock).toHaveBeenCalledTimes(1)
+describe('GerenciarPage', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    listPetsMock.mockResolvedValue(pets)
   })
 
-  it('should not load pets when session is invalid', async () => {
-      spyApi.mockRejectedValue(new Error('failed'))
+  it('should render the donor contact link and pet filters', async () => {
+    renderPage()
 
-      vi.useFakeTimers()
-
-      renderPage()
-
-      await act(async () => {
-          await Promise.resolve()
-      })
-
-      expect(mockRedirect).toHaveBeenCalledWith('/painel')
-      expect(listPetsMock).not.toHaveBeenCalled()
+    expect(await screen.findByText('Rex')).toBeInTheDocument()
+    expect(screen.getByText('Contato de Doadores')).toBeInTheDocument()
+    expect(screen.getByText('Filtrar')).toBeInTheDocument()
+    expect(screen.getByLabelText('Espécie')).toBeInTheDocument()
+    expect(screen.getByLabelText('Sexo')).toBeInTheDocument()
+    expect(screen.getByLabelText('Porte')).toBeInTheDocument()
   })
-  it('should load pets when session is valid', async () => {
-      spyApi.mockResolvedValueOnce(undefined)
-      spyApi.mockRejectedValueOnce(new Error("failed"))
-      vi.useFakeTimers()
 
-      renderPage()
+  it('should render the adopted filter for the admin page', async () => {
+    renderPage()
 
-      await act(async () => {
-          await Promise.resolve()
-      })
-
-      expect(mockRedirect).not.toHaveBeenCalled()
-      expect(listPetsMock).toHaveBeenCalledTimes(1)
+    expect(await screen.findByLabelText('Adotado')).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Sim' })).toBeInTheDocument()
+    expect(screen.getByRole('option', { name: 'Não' })).toBeInTheDocument()
   })
-  it('should redirect when the session expires after one hour', async () => {
-    spyApi.mockResolvedValueOnce(undefined)
-    spyApi.mockRejectedValueOnce(new Error('failed'))
 
-    vi.useFakeTimers()
+  it('should render pets with admin controls enabled', async () => {
+    renderPage()
+
+    const petItem = await screen.findByTestId('pet-item')
+
+    expect(petItem).toHaveTextContent('Rex')
+    expect(petItem).toHaveAttribute('data-admin', 'true')
+  })
+
+  it('should filter pets by the adopted status', async () => {
+    listPetsMock.mockResolvedValue([
+      ...pets,
+      { ...pets[0], id: 'pet-2', nome: 'Mimi', adotado: true },
+    ])
+
+    renderPage()
+    await screen.findByText('Mimi')
+
+    fireEvent.change(screen.getByLabelText('Adotado'), { target: { value: 'true' } })
+
+    expect(screen.getByTestId('pet-item')).toHaveTextContent('Mimi')
+    expect(screen.queryByText('Rex')).not.toBeInTheDocument()
+  })
+
+  it('should render the empty state when no pets match', async () => {
+    listPetsMock.mockResolvedValue([])
 
     renderPage()
 
-
-    await act(async () => {
-      await Promise.resolve()
-    })
-
-    expect(mockRedirect).not.toHaveBeenCalled()
-    expect(listPetsMock).toHaveBeenCalledTimes(1)
-
-    
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(60 * 60 * 1000)
-    })
-
-    expect(mockRedirect).toHaveBeenCalledWith('/painel')
-    expect(listPetsMock).toHaveBeenCalledTimes(1)
+    expect(await screen.findByText('Nenhum animal encontrado.')).toBeInTheDocument()
   })
 })
