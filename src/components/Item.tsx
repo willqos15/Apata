@@ -37,7 +37,7 @@ function capitalize(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 }
 
 export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }: ItemProps) {
-  const { id, nome, descricao, especie, foto, porte, sexo, faixa_etaria, contato, adotado, vacinado, vermifugado, castrado } = pet
+  const { id, nome, descricao, especie, foto, porte, sexo, faixa_etaria, contato, adotado, vacinado, vermifugado, castrado, castracaoGarantida } = pet
 
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -56,7 +56,7 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
     reset,
   } = useForm<PetFormValues>({
     mode: 'onChange',
-    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', faixa_etaria: '', contato: '',adotado: false,  vacinado: false, vermifugado: false, castrado: false,
+    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', faixa_etaria: '', contato: '',adotado: false,  vacinado: false, vermifugado: false, castrado: false, castracaoGarantida: false,
     },
   })
 
@@ -107,6 +107,7 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
       vacinado: !!vacinado,
       vermifugado: !!vermifugado,
       castrado: !!castrado,
+      castracaoGarantida: !!castracaoGarantida,
     })
   }
 
@@ -352,6 +353,10 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" {...register('castrado')} className="w-5 h-5 accent-(--bg-color)" />
                   <span className="text-[16px] font-bold">Castrado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('castracaoGarantida')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Castração Garantida</span>
                 </label>
               </div>
 

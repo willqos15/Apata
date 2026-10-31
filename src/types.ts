@@ -17,6 +17,7 @@ export interface Pet {
   vacinado: boolean | null
   vermifugado: boolean | null
   castrado: boolean | null
+  castracaoGarantida?: boolean | null
 }
 
 export interface PetFormValues {
@@ -31,6 +32,7 @@ export interface PetFormValues {
   vacinado: boolean
   vermifugado: boolean
   castrado: boolean
+  castracaoGarantida: boolean
 }
 
 export interface PetFilters {
