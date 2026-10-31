@@ -32,6 +32,16 @@ export async function listDonations(): Promise<Donation[]> {
   return data
 }
 
+export async function updateDonationStatus(id: Donation['id'], status: Donation['status']): Promise<Donation> {
+  const { data } = await axios.put<Donation>(
+    `${API_URL}/doacoes/${id}`,
+    { status },
+    authConfig()
+  )
+
+  return data
+}
+
 export async function createDonation(payload: DonationPayload): Promise<Donation> {
   const { data } = await axios.post<Donation>(`${API_URL}/doacoes`, payload)
   return data
