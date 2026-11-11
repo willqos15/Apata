@@ -38,9 +38,10 @@ model Pet {
   aprovado Boolean @default(true)
   tutelado Boolean @default(true)
 
-  vacinado    Boolean? @default(false)
-  vermifugado Boolean? @default(false)
-  castrado    Boolean? @default(false)
+  vacinado           Boolean? @default(false)
+  vermifugado        Boolean? @default(false)
+  castrado           Boolean? @default(false)
+  castracaoGarantida Boolean? @default(false)
 
   deleted_at DateTime?
 

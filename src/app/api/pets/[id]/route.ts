@@ -9,7 +9,7 @@ interface RouteParams {
   params: Promise<{ id: string }>
 }
 
-const BOOLEAN_FIELDS = ['adotado', 'vacinado', 'vermifugado', 'castrado'] as const
+const BOOLEAN_FIELDS = ['adotado', 'vacinado', 'vermifugado', 'castrado', 'castracaoGarantida'] as const
 
 function convertBooleansToString(fields: Record<string, unknown>): void {
   for (const field of BOOLEAN_FIELDS) {

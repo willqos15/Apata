@@ -1,6 +1,7 @@
 export type Species = 'cachorro' | 'gato'
 export type Sex = 'macho' | 'femea'
 export type Size = 'pequeno' | 'medio' | 'grande'
+export type FaixaEtaria = 'Filhote' | 'Adulto' | 'Idoso'
 
 export interface Pet {
   id: string
@@ -9,12 +10,14 @@ export interface Pet {
   especie: Species
   sexo: Sex
   porte: Size
+  faixa_etaria?: FaixaEtaria | null
   descricao: string
   contato: string | null
   adotado: boolean
   vacinado: boolean | null
   vermifugado: boolean | null
   castrado: boolean | null
+  castracaoGarantida?: boolean | null
 }
 
 export interface PetFormValues {
@@ -23,11 +26,13 @@ export interface PetFormValues {
   especie: Species | ''
   porte: Size | ''
   sexo: Sex | ''
+  faixa_etaria?: FaixaEtaria | ''
   contato: string
   adotado: boolean
   vacinado: boolean
   vermifugado: boolean
   castrado: boolean
+  castracaoGarantida: boolean
 }
 
 export interface PetFilters {
@@ -35,6 +40,7 @@ export interface PetFilters {
   species: Species | ''
   sex: Sex | ''
   size: Size | ''
+  adopted: boolean | ''
 }
 
 export interface LoginPayload {

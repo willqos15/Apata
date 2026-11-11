@@ -1,12 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient
+} from "@tanstack/react-query"
 import { redirect } from "next/navigation";
 import { IoLogoWhatsapp } from "react-icons/io";
 import Button from "@/components/Button";
 import Spinner from "@/components/Spinner";
 import { useSession } from "@/hooks/useSession";
-import { listDonations } from "@/lib/api";
+import type { DonationStatus } from "@/types"
+import { listDonations, updateDonationStatus } from "@/lib/api";
 
 const ITEM_LABELS: Record<string, string> = {
   racao: "Ração",
@@ -33,6 +38,21 @@ export default function DoacoesPage() {
     queryFn: listDonations,
     enabled: isValidSession === true,
   });
+
+  const queryClient = useQueryClient()
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }: {
+      id: string
+      status: DonationStatus
+    }) => updateDonationStatus(id, status),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["doacoes"]
+      })
+    }
+  })
 
   if (isValidSession === false) redirect("/painel");
 
@@ -87,11 +107,38 @@ export default function DoacoesPage() {
                     .map((item) => ITEM_LABELS[item] ?? item)
                     .join(", ")}
                 </p>
+                
                 {donation.observacoes?.trim() && (
                   <p className="mt-2 whitespace-pre-wrap">
                     <strong>Observações:</strong> {donation.observacoes}
                   </p>
                 )}
+
+                <div className="mt-4">
+                    <label
+                      htmlFor={`status-${donation.id}`}
+                      className="block mb-2 font-semibold"
+                    >
+                      Status da doação
+                    </label>
+
+                    <select
+                      id={`status-${donation.id}`}
+                      value={donation.status}
+                      onChange={(event) => {
+                        updateStatusMutation.mutate({
+                          id: donation.id,
+                          status: event.target.value as DonationStatus,
+                        })
+                      }}
+                      className="w-full rounded-lg border p-2 bg-(--bg-color)"
+                      >
+
+                    <option value="pendente">Pendente</option>
+                    <option value="contatado">Contatado</option>
+                    <option value="concluido">Concluído</option>
+                  </select>
+                </div>
               </li>
             ))}
           </ul>
