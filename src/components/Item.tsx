@@ -227,11 +227,18 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
             }`}
           >
             <label className="font-bold text-[18px]">
-              {especie === 'cachorro' && sexo === 'macho' && ' Cachorro de '}
-              {especie === 'cachorro' && sexo === 'femea' && ' Cadela de '}
-              {especie === 'gato' && sexo === 'femea' && 'Gata de '}
-              {especie === 'gato' && sexo === 'macho' && 'Gato de '}
-              porte {porte === 'medio' ? 'médio' : porte}
+              {especie === "cachorro"
+                ? sexo === "macho" ? "Cachorro" : "Cadela"
+                : sexo === "macho" ? "Gato" : "Gata"}
+              {" "}
+              {(sexo === "femea"
+                ? faixa_etaria === "Adulto" ? "Adulta"
+                  : faixa_etaria === "Idoso" ? "Idosa"
+                    : faixa_etaria
+                : faixa_etaria
+              )?.toLowerCase()}
+              {" de porte "}
+              {porte === "medio" ? "médio" : porte}
             </label>
             <p className="text-center text-[18px] line-clamp-3">{descricao}.</p>
   
