@@ -37,7 +37,7 @@ function capitalize(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
 }
 
 export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }: ItemProps) {
-  const { id, nome, descricao, especie, foto, porte, sexo, contato, adotado, vacinado, vermifugado, castrado } = pet
+  const { id, nome, descricao, especie, foto, porte, sexo, faixa_etaria, contato, adotado, vacinado, vermifugado, castrado, castracaoGarantida } = pet
 
   const [expanded, setExpanded] = useState(false)
   const [editing, setEditing] = useState(false)
@@ -56,7 +56,7 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
     reset,
   } = useForm<PetFormValues>({
     mode: 'onChange',
-    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', contato: '',adotado: false,  vacinado: false, vermifugado: false, castrado: false,
+    defaultValues: { nome: '', descricao: '', especie: '', porte: '', sexo: '', faixa_etaria: '', contato: '',adotado: false,  vacinado: false, vermifugado: false, castrado: false, castracaoGarantida: false,
     },
   })
 
@@ -68,6 +68,7 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
       const formData = new FormData()
       ;(Object.keys(values) as Array<keyof PetFormValues>).forEach((key) => {
         const value = values[key]
+        if (value === undefined) return
         formData.append(key, typeof value === 'boolean' ? String(value) : value)
       })
 
@@ -100,11 +101,13 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
       especie,
       porte,
       sexo,
+      faixa_etaria: faixa_etaria ?? '',
       contato: contato ? digitsOnly(contato) : '',
       adotado: !!adotado,
       vacinado: !!vacinado,
       vermifugado: !!vermifugado,
       castrado: !!castrado,
+      castracaoGarantida: !!castracaoGarantida,
     })
   }
 
@@ -224,15 +227,22 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
             }`}
           >
             <label className="font-bold text-[18px]">
-              {especie === 'cachorro' && sexo === 'macho' && ' Cachorro de '}
-              {especie === 'cachorro' && sexo === 'femea' && ' Cadela de '}
-              {especie === 'gato' && sexo === 'femea' && 'Gata de '}
-              {especie === 'gato' && sexo === 'macho' && 'Gato de '}
-              porte {porte === 'medio' ? 'médio' : porte}
+              {especie === "cachorro"
+                ? sexo === "macho" ? "Cachorro" : "Cadela"
+                : sexo === "macho" ? "Gato" : "Gata"}
+              {" "}
+              {(sexo === "femea"
+                ? faixa_etaria === "Adulto" ? "Adulta"
+                  : faixa_etaria === "Idoso" ? "Idosa"
+                    : faixa_etaria
+                : faixa_etaria
+              )?.toLowerCase()}
+              {" de porte "}
+              {porte === "medio" ? "médio" : porte}
             </label>
             <p className="text-center text-[18px] line-clamp-3">{descricao}.</p>
   
-            {(adotado || vermifugado || castrado || vacinado) && (
+            {(adotado || vermifugado || castrado || vacinado || castracaoGarantida) && (
                 <div className="flex flex-wrap gap-1 justify-center mt-1">
                     {adotado && (
                         <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-green-600 border-green-700 text-white">
@@ -252,6 +262,11 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
                     {vacinado && (
                         <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-blue-100 border-blue-600 text-blue-700">
                             <MdVaccines /> Vacinado
+                        </span>
+                    )}
+                    {castracaoGarantida && (
+                        <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-violet-100 border-violet-600 text-violet-700">
+                            <FaSyringe /> Castração Garantida
                         </span>
                     )}
                 </div>
@@ -318,6 +333,17 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
               {errors.sexo && <p>Campo obrigatório</p>}
 
               <label>
+                <strong>Faixa Etária:</strong>
+              </label>
+              <select className="input" {...register('faixa_etaria', { required: true })}>
+                <option value="">Selecione</option>
+                <option value="Filhote">Filhote</option>
+                <option value="Adulto">Adulto</option>
+                <option value="Idoso">Idoso</option>
+              </select>
+              {errors.faixa_etaria && <p>Campo obrigatório</p>}
+
+              <label>
                 <strong>Descrição:</strong>
               </label>
               <textarea className="textarea" {...register('descricao', { required: true, onChange: capitalize })} />
@@ -339,6 +365,10 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" {...register('castrado')} className="w-5 h-5 accent-(--bg-color)" />
                   <span className="text-[16px] font-bold">Castrado</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input type="checkbox" {...register('castracaoGarantida')} className="w-5 h-5 accent-(--bg-color)" />
+                  <span className="text-[16px] font-bold">Castração Garantida</span>
                 </label>
               </div>
 
