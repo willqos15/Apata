@@ -235,7 +235,7 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
             </label>
             <p className="text-center text-[18px] line-clamp-3">{descricao}.</p>
   
-            {(adotado || vermifugado || castrado || vacinado) && (
+            {(adotado || vermifugado || castrado || vacinado || castracaoGarantida) && (
                 <div className="flex flex-wrap gap-1 justify-center mt-1">
                     {adotado && (
                         <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-green-600 border-green-700 text-white">
@@ -255,6 +255,11 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
                     {vacinado && (
                         <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-blue-100 border-blue-600 text-blue-700">
                             <MdVaccines /> Vacinado
+                        </span>
+                    )}
+                    {castracaoGarantida && (
+                        <span className="flex items-center gap-1 text-xs font-bold px-1.5 py-0.5 rounded-full border bg-violet-100 border-violet-600 text-violet-700">
+                            <FaSyringe /> Castração Garantida
                         </span>
                     )}
                 </div>
