@@ -29,6 +29,7 @@ const EMPTY_VALUES: PetFormValues = {
   adotado: false,
   vacinado: false,
   vermifugado: false,
+  castracaoGarantida: false,
   castrado: false,
 }
 
@@ -130,6 +131,7 @@ export default function PetForm() {
       resetField('faixa_etaria', { defaultValue: '' })
       resetField('descricao', { defaultValue: '' })
       resetField('adotado', { defaultValue: false })
+      resetField('castracaoGarantida', { defaultValue: false })
       resetField('contato', { defaultValue: values.contato })
       resetPhoto()
       setStatus('inicio')
@@ -266,6 +268,10 @@ export default function PetForm() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" {...register('adotado')} className="w-5 h-5 accent-(--bg-color)" />
               <span className="text-[16px] font-bold">Adotado</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" {...register('castracaoGarantida')} className="w-5 h-5 accent-(--bg-color)" />
+              <span className="text-[16px] font-bold">Castracão Garantida</span>
             </label>
           </div>
 

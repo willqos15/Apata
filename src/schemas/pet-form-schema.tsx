@@ -16,5 +16,6 @@ export const petFormSchema = z.object({
   vacinado: z.boolean('Campo obrigatório'),
   vermifugado: z.boolean('Campo obrigatório'),
   castrado: z.boolean('Campo obrigatório'),
-  adotado: z.boolean('Campo obrigatório')
+  adotado: z.boolean('Campo obrigatório'),
+  castracaoGarantida: z.boolean('Campo obrigatório')
 })
