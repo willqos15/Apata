@@ -95,6 +95,7 @@ describe('PetForm - Faixa Etária', () => {
       vacinado: false,
       vermifugado: false,
       castrado: false,
+      castracaoGarantida: false
     })
 
     const user = userEvent.setup()
