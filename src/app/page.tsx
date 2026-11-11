@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     ...BASE_OPEN_GRAPH,
     url: '/',
-    title: `Adoção de Cães e Gatos em Altamira (PA) | ${SITE_NAME}`,
+    title: `${SITE_NAME}`,
     description: SITE_DESCRIPTION,
   },
 }
