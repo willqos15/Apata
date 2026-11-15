@@ -47,7 +47,7 @@ export default function HomePets({ initialPets }: HomePetsProps) {
 
         {!isPending && !isError && (
           <div className="bg-(--bg-color2) w-fit rounded-sm p-4 mx-auto items-center flex flex-col mb-2">
-            <PetFilters filters={filters} onChange={setFilters} />
+            <PetFilters filters={filters} onChange={setFilters} isAdmin={false}/>
           </div>
         )}
       </div>
