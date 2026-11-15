@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { PatternFormat } from 'react-number-format'
 import Button from './Button'
+import ImageCropper from './ImageCropper'
 import Spinner from './Spinner'
 import { createPet } from '@/lib/api'
 import { scrollIntoCenter } from '@/lib/focus'
@@ -22,14 +23,17 @@ const EMPTY_VALUES: PetFormValues = {
   especie: '',
   porte: '',
   sexo: '',
+  faixa_etaria: '',
   descricao: '',
   contato: DEFAULT_PHONE,
+  adotado: false,
   vacinado: false,
   vermifugado: false,
+  castracaoGarantida: false,
   castrado: false,
 }
 
-// Subcomponente para eliminar a repetição dos três <select> com estrutura idêntica.
+// Subcomponente para eliminar a repetição dos <select> com estrutura idêntica.
 function SelectField({
   label,
   options,
@@ -65,6 +69,8 @@ export default function PetForm() {
   const photoInput = useRef<HTMLInputElement>(null)
   const [photoError, setPhotoError] = useState<'' | 'erro'>('')
   const [fileName, setFileName] = useState('')
+  const [cropSource, setCropSource] = useState<File | null>(null)
+  const [cropOpen, setCropOpen] = useState(false)
   const [message, setMessage] = useState<SubmitMessage>('')
   const [status, setStatus] = useState<SubmitStatus>('inicio')
 
@@ -107,10 +113,13 @@ export default function PetForm() {
     formData.append('especie', values.especie)
     formData.append('porte', values.porte)
     formData.append('sexo', values.sexo)
+    formData.append('faixa_etaria', values.faixa_etaria)
     formData.append('descricao', values.descricao)
     formData.append('vacinado', values.vacinado ? 'true' : 'false')
     formData.append('vermifugado', values.vermifugado ? 'true' : 'false')
     formData.append('castrado', values.castrado ? 'true' : 'false')
+    formData.append('castracaoGarantida', values.castracaoGarantida ? 'true' : 'false')
+    formData.append('adotado', values.adotado ? 'true' : 'false')
     if (photoFile.current) formData.append('file', photoFile.current)
     formData.append('contato', values.contato)
 
@@ -120,7 +129,10 @@ export default function PetForm() {
       resetField('especie', { defaultValue: '' })
       resetField('porte', { defaultValue: '' })
       resetField('sexo', { defaultValue: '' })
+      resetField('faixa_etaria', { defaultValue: '' })
       resetField('descricao', { defaultValue: '' })
+      resetField('adotado', { defaultValue: false })
+      resetField('castracaoGarantida', { defaultValue: false })
       resetField('contato', { defaultValue: values.contato })
       resetPhoto()
       setStatus('inicio')
@@ -135,13 +147,41 @@ export default function PetForm() {
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    setCropSource(file)
+    setCropOpen(true)
+  }
+
+  function cancelCrop() {
+    setCropOpen(false)
+    setCropSource(null)
+
+    if (photoInput.current) photoInput.current.value = ''
+  }
+  function confirmCrop(file: File) {
     photoFile.current = file
     setFileName(file.name)
     setPhotoError('')
+    setCropOpen(false)
+    setCropSource(null)
+
+    if (photoInput.current) photoInput.current.value = ''
   }
 
   return (
     <div className="pt-10 relative min-h-screen">
+      <ImageCropper
+        key={
+          cropSource
+            ? `${cropSource.name}-${cropSource.lastModified}`
+            : 'cropper'
+        }
+        image={cropSource}
+        open={cropOpen}
+        onConfirm={confirmCrop}
+        onCancel={cancelCrop}
+      />
+
       <form
         onSubmit={(e) => void handleSubmit(submit)(e)}
         className="flex flex-col max-w-72 px-5 my-10 mx-auto justify-start rounded-2xl bg-(--bg-color2)"
@@ -192,6 +232,17 @@ export default function PetForm() {
             {...register('sexo')}
           />
 
+          <SelectField
+            label="Faixa Etária"
+            options={[
+              { value: 'Filhote', label: 'Filhote' },
+              { value: 'Adulto', label: 'Adulto' },
+              { value: 'Idoso', label: 'Idoso' },
+            ]}
+            error={errors.faixa_etaria?.message}
+            {...register('faixa_etaria')}
+          />
+
           <label className="formlabel"> Sobre:</label>
           <textarea
             className="textarea max-h-16"
@@ -214,6 +265,14 @@ export default function PetForm() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" {...register('castrado')} className="w-5 h-5 accent-(--bg-color)" />
               <span className="text-[16px] font-bold">Castrado</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" {...register('adotado')} className="w-5 h-5 accent-(--bg-color)" />
+              <span className="text-[16px] font-bold">Adotado</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" {...register('castracaoGarantida')} className="w-5 h-5 accent-(--bg-color)" />
+              <span className="text-[16px] font-bold">Castração Garantida</span>
             </label>
           </div>
 

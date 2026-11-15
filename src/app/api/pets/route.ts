@@ -4,6 +4,7 @@ import { authenticate } from '@/server/auth'
 import { readPetBody } from '@/server/body'
 import { uploadPetPhoto } from '@/server/cloudinary'
 import { findActivePets } from '@/server/pets'
+import type { FaixaEtaria } from '@prisma/client';
 
 export async function GET() {
   try {
@@ -20,11 +21,25 @@ export async function POST(request: NextRequest) {
   if ('error' in auth) return auth.error
 
   try {
-    const { fields, file } = await readPetBody(request)
-    const { nome, especie, porte, sexo, descricao, tutelado, contato, vacinado, vermifugado, castrado } = fields
+    const { fields, file } = await readPetBody(request);
+    const {
+      nome,
+      especie,
+      porte,
+      sexo,
+      faixa_etaria,
+      descricao,
+      tutelado,
+      contato,
+      vacinado,
+      vermifugado,
+      castrado,
+      castracaoGarantida,
+      adotado
+    } = fields;
 
-    let fotoUrl: string | null = null
-    let publicId: string | null = null
+    let fotoUrl: string | null = null;
+    let publicId: string | null = null;
 
     if (file) {
       const resultado = await uploadPetPhoto(file)
@@ -38,26 +53,28 @@ export async function POST(request: NextRequest) {
         especie: especie as string,
         porte: porte as string,
         sexo: sexo as string,
+        faixa_etaria: faixa_etaria as FaixaEtaria | undefined,
         descricao: descricao as string,
         contato: contato as string | undefined,
         vacinado: vacinado === 'true' || vacinado === true,
         vermifugado: vermifugado === 'true' || vermifugado === true,
         castrado: castrado === 'true' || castrado === true,
+        castracaoGarantida: castracaoGarantida === 'true' || castracaoGarantida === true,
         tutelado: tutelado === 'true' || tutelado === true,
         aprovado: true,
-        adotado: false,
+        adotado: adotado === 'true' || adotado === true,
         foto: fotoUrl,
         public_idfoto: publicId,
         ownerId: auth.userId,
         deleted_at: null,
       },
-    })
+    });
 
-    return NextResponse.json(novoPet, { status: 201 })
+    return NextResponse.json(novoPet, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { error: 'Erro ao cadastrar pet', details: error instanceof Error ? error.message : undefined },
       { status: 500 },
-    )
+    );
   }
 }

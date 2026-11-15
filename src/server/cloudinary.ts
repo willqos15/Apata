@@ -1,5 +1,6 @@
 import { v2 as cloudinary, type UploadApiResponse } from 'cloudinary'
 import { withTimeout } from '@/server/timeout'
+import { optimizePetImage } from '@/server/image'
 
 const PETS_FOLDER = 'pets_apata'
 const UPLOAD_TIMEOUT_MS = 10_000
@@ -12,15 +13,19 @@ cloudinary.config({
 })
 
 export async function uploadPetPhoto(file: File): Promise<UploadApiResponse> {
-  const buffer = Buffer.from(await file.arrayBuffer())
+  const rawBuffer = Buffer.from(await file.arrayBuffer())
+  const optimizedBuffer = await optimizePetImage(rawBuffer)
 
   const upload = new Promise<UploadApiResponse>((resolve, reject) => {
-    const uploadStream = cloudinary.uploader.upload_stream({ folder: PETS_FOLDER }, (error, result) => {
-      if (error) reject(error)
-      else if (result) resolve(result)
-      else reject(new Error('Upload sem resposta'))
-    })
-    uploadStream.end(buffer)
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: PETS_FOLDER, format: 'webp' },
+      (error, result) => {
+        if (error) reject(error)
+        else if (result) resolve(result)
+        else reject(new Error('Upload sem resposta'))
+      },
+    )
+    uploadStream.end(optimizedBuffer)
   })
 
   return withTimeout(upload, UPLOAD_TIMEOUT_MS, 'Tempo esgotado ao enviar a imagem')

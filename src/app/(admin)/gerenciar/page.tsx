@@ -93,7 +93,7 @@ export default function GerenciarPage() {
           <section className="flex flex-wrap m-4 gap-2 justify-center items-start">
             <div className="flex flex-col p-4 flex-wrap gap-2 w-fit items-center justify-center bg-(--bg-color2)">
               <p className="text-(--text-color)">Filtrar</p>
-              <PetFilters filters={filters} onChange={setFilters} />
+              <PetFilters filters={filters} onChange={setFilters} isAdmin={true}/>
             </div>
           </section>
 

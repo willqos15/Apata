@@ -7,10 +7,10 @@ import { PatternFormat } from 'react-number-format'
 import { IoLogoWhatsapp } from 'react-icons/io'
 import Button from './Button'
 import Spinner from './Spinner'
+import { createDonation } from '@/lib/api'
 import { scrollIntoCenter } from '@/lib/focus'
+import { OBSERVATION_LIMIT } from '@/schemas/donation-schema'
 import type { DonationFormValues, DonationItem } from '@/types'
-
-const OBSERVATION_LIMIT = 500
 
 const PHONE_FORMAT = '(##) #####-####'
 
@@ -44,6 +44,7 @@ function FormError({ id, error }: { id: string; error?: FieldError }) {
 
 export default function DonationForm() {
   const [sent, setSent] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
 
   const {
     register,
@@ -56,17 +57,26 @@ export default function DonationForm() {
   const observations = useWatch({ control, name: 'observacoes' })
 
   async function submit(values: DonationFormValues) {
-    // Simula a latência de rede para que o estado de "enviando" já fique pronto para o back-end.
-    await new Promise((resolve) => setTimeout(resolve, 8000))
+    setSubmitError(false)
 
-    // TODO: integrar com API, enviar `values` para o back-end aqui e tratar o erro de envio.
-    console.log(values)
-
-    setSent(true)
+    try {
+      // Os nomes dos campos seguem o model `Doacao` da API.
+      await createDonation({
+        nomeCompleto: values.nome.trim(),
+        whatsapp: values.telefone.replace(/\D/g, ''),
+        tipos: values.item ? [values.item] : [],
+        observacoes: values.observacoes.trim() || undefined,
+      })
+      setSent(true)
+    } catch (error) {
+      console.error(error)
+      setSubmitError(true)
+    }
   }
 
   function startNewDonation() {
     reset(INITIAL_VALUES)
+    setSubmitError(false)
     setSent(false)
   }
 
@@ -205,6 +215,12 @@ export default function DonationForm() {
           </form>
 
           {isSubmitting && <Spinner className="mx-auto m-4" />}
+
+          {submitError && !isSubmitting && (
+            <p className="max-w-72 w-full mx-auto text-base text-[rgb(128,0,0)] font-bold" role="alert">
+              Não foi possível enviar sua doação. Verifique sua conexão e tente novamente.
+            </p>
+          )}
         </>
       )}
     </div>
