@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
   icons: { icon: '/logoapata.svg' },
+  verification: {
+    google: 'wlQetApKfsbb7ENywmtjnuxE9yyzdPcl7zo-w1wzHck',
+  },
   openGraph: BASE_OPEN_GRAPH,
   twitter: { card: 'summary' },
 }
