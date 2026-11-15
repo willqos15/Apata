@@ -18,7 +18,7 @@ const wdxl = WDXL_Lubrifont_JP_N({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `Adoção de Cães e Gatos em Altamira (PA) | ${SITE_NAME}`,
+    default: `${SITE_NAME}`,
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
