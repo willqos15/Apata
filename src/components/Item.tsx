@@ -223,7 +223,7 @@ export default function Item({ pet, admin, onDelete, onUpdate, onStart, onEnd }:
         {!admin ? (
           <div
             className={`w-full bg-(--bg-color2) text-(--text-color2) px-2 py-0 pt-0 flex flex-col ease-linear transition-opacity ${
-              expanded ? 'max-h-40 duration-500 opacity-100 overflow-visible' : ' max-h-0  duration-0 overflow-hidden'
+              expanded ? 'max-h-150 duration-500 opacity-100 overflow-visible' : ' max-h-0  duration-0 overflow-hidden'
             }`}
           >
             <label className="font-bold text-[18px]">
