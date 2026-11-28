@@ -45,10 +45,11 @@ export default function MFooter() {
                         Doar via Pix
                     </Link>
                     <a
-                        href="mailto:apatadealtamira@gmail.com?subject=Quero%20ser%20volunt%C3%A1rio"
+                        href="https://chat.whatsapp.com/CwqD6s5Ft5C9ITPPsE1V7q"
+                        target="_blank"
                         className="py-0.5 transition-colors hover:text-(--tertiary-color)"
                     >
-                        Voluntários
+                        Seja voluntário
                     </a>
                 </nav>
 
